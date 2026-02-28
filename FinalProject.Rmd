@@ -1,0 +1,39 @@
+---
+title: "FinalProject"
+output: html_document
+date: "2026-02-28"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Data Loading
+
+```{r initial_analysis, echo=TRUE}
+data <- read.csv("IMPCH.csv")
+impch <- data$IMPCH
+
+impch_ts <- ts(impch, start=c(1985,1), frequency=12)
+plot(impch_ts)
+```
+
+## Preprocessing
+We can do some analysis here on trend / seasonality/ whatever. We can also split our training data now.
+```{r pressure, echo=TRUE}
+# TODO: normalize dataset, will need to in all likelihood. Run tests for all those things
+```
+
+
+## Model Fitting
+Do our ARIMA / EPS / VAR / all the model fitting here
+```{r model_fit, echo=TRUE}
+# Fit at least three different types of models for evaluation. We can choose one of the sliding windows to use here as well
+```
+
+
+
+## Model Forecasting
+Do the extra stuff here
+```{r forecast, echo=TRUE}
+```
