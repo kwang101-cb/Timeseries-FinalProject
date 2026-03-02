@@ -174,7 +174,20 @@ autoplot(impch_ts) +
   labs(x = "Time", y = "IMPCH")
 ```
 
-## Model 2
-We've done a standard SARIMA model, and found that the best we can produce is (2,1,1)(2,1,0). Now, we can try other models and see their respective performances as well
+## Model 2 (VAR)
+
+
+## Model 3 (Sine / Cosine)
+
+```{r fourier, echo=TRUE}
+# start with spectral analysis
+library(TSA)
+library
+df_periodogram <- periodogram(diff1)
+dd <- data.frame(freq = df_periodogram$freq, spec = df_periodogram$spec)
+periodogram_sorted <- dd[order(-dd$spec), ]
+head(periodogram_sorted)
+```
+We see that the highest frequencies are .083 (represents annual seasonality), (perhaps quarterly, since its roughly every 3 months), .25 (every four months)
 
 ```{r model_expand_slide}
