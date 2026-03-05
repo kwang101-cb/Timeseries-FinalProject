@@ -151,6 +151,8 @@ fc_impch_arima$lower <- InvBoxCox(fc_arima$lower, lambda)
 fc_impch_arima$upper <- InvBoxCox(fc_arima$upper, lambda)
 fc_impch_arima$x <- impch_ts
 
+
+accuracy(fc_arima, test)
 autoplot(fc_impch_arima) +
   ggtitle("IMPCH: ARIMA forecasts for next periods") +
   ylab("IMPCH") +
@@ -179,7 +181,7 @@ autoplot(impch_ts) +
 
 ## Model 3 (Sine / Cosine)
 
-```{r fourier, echo=TRUE}
+```{r periodogram, echo=TRUE}
 # start with spectral analysis
 library(TSA)
 library
@@ -190,4 +192,62 @@ head(periodogram_sorted)
 ```
 We see that the highest frequencies are .083 (represents annual seasonality), (perhaps quarterly, since its roughly every 3 months), .25 (every four months)
 
-```{r model_expand_slide}
+```{r harmonics, echo=TRUE }
+harmonics <- auto.arima(train, , xreg=fourier(train, 4))
+forecast_harmonics <- forecast(harmonics, xreg=fourier(train,4,h))
+
+
+fc_harmonics_bc <- forecast_harmonics
+
+fc_harmonics_bc$mean <- InvBoxCox(forecast_harmonics$mean,  lambda)
+fc_harmonics_bc$lower <- InvBoxCox(forecast_harmonics$lower, lambda)
+fc_harmonics_bc$upper <- InvBoxCox(forecast_harmonics$upper, lambda)
+fc_harmonics_bc$x <- impch_ts
+
+
+autoplot(fc_harmonics_bc, series = "Harmonics Forecast") +
+  autolayer(impch_ts, series = "Actual")
+  ggtitle("IMPCH: Dynamic Harmonic Regression") +
+  ylab("IMPCH") +
+  xlab("Time")
+  
+summary(forecast_harmonics)
+accuracy(forecast_harmonics, test)
+
+```
+
+
+```{r intervention_analysis_forecast, echo=TRUE}
+
+interv_train <- rep(0, length(train))
+
+# everything from Jan 2020 (COVID) onwards is 1
+interv_train[421:length(train)] <- 1
+
+# 3. Fit the Arima model (capital A)
+# xreg treats this vector as your intervention
+interv_model <- Arima(train, 
+             order = c(2,1,1), 
+             seasonal = c(2,1,0), 
+             xreg = interv_train)
+
+# 4. Forecast for h months
+h <- length(test)
+interv_future <- rep(1, h)
+
+interv_forecast <- forecast(interv_model, xreg = interv_future)
+
+accuracy(interv_forecast, test)
+
+# 2. Print the results
+print(interv_metrics)
+summary(interv_model)
+
+# 5. Check the BIC and Forecast
+
+# Use autoplot for a professional look
+autoplot(interv_forecast) + 
+  autolayer(test, series="Actual Test Data", color="red") +
+  ggtitle("ARIMAX Forecast vs. Actuals") +
+  guides(colour=guide_legend(title="Legend"))
+```
